@@ -1,0 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ══════════════════════════════════════
+   DESIGN TOKENS — Spotify-like dark
+   ══════════════════════════════════════ */
+
+:root {
+  --bg-main: #070707;
+  --bg-card: #111111;
+  --bg-hover: #1b1b1b;
+  --bg-glass: rgba(18, 18, 18, 0.94);
+
+  --neon-blue: #1db954;
+  --neon-pink: #1ed760;
+  --neon-green: #1db954;
+  --neon-purple: #1db954;
+
+  --glow-blue: rgba(30, 215, 96, 0.28);
+  --glow-pink: rgba(30, 215, 96, 0.2);
+  --glow-green: rgba(30, 215, 96, 0.3);
+  --glow-purple: rgba(30, 215, 96, 0.3);
+
+  --border-neon: rgba(255, 255, 255, 0.08);
+  --border-bright: rgba(29, 185, 84, 0.45);
+
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-dim: #8a8a8a;
+
+  --font-display: 'Exo 2', system-ui, sans-serif;
+  --font-body: 'Exo 2', system-ui, sans-serif;
+
+  --border-radius: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+@theme inline {
+  --color-background: var(--bg-main);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-body);
+
+  --color-neon-blue: var(--neon-blue);
+  --color-neon-pink: var(--neon-pink);
+  --color-neon-green: var(--neon-green);
+  --color-card: var(--bg-card);
+  --color-hover: var(--bg-hover);
+
+  --color-slate-400: var(--text-secondary);
+  --color-slate-500: #6a6a9a;
+  --color-slate-700: #2a2a4a;
+  --color-slate-800: #1a1a30;
+  --color-slate-900: #0d0d1f;
+  --color-slate-950: #0f0f1a;
+}
+
+/* ══════════════════════════════════════
+   BODY & ROOT
+   ══════════════════════════════════════ */
+body {
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+html {
+  background: var(--bg-main);
+}
+
+/* ══════════════════════════════════════
+   UTILITIES
+   ══════════════════════════════════════ */
+
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-neon);
+  border-radius: var(--border-radius);
+  box-shadow: none;
+}
+
+/* ══════════════════════════════════════
+   KEYFRAME ANIMATIONS
+   ══════════════════════════════════════ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+@keyframes fadeInSoft {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeftSoft {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRightSoft {
+  from {
+    opacity: 0;
+    transform: translateX(22px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes sheetUpSoft {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes playerRise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseSoft {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.motion-overlay {
+  animation: fadeInSoft 0.2s ease-out both;
+}
+
+.motion-sidebar-enter {
+  animation: slideInLeftSoft 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.motion-panel-enter {
+  animation: sheetUpSoft 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.motion-player-enter {
+  animation: playerRise 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.motion-btn {
+  transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+}
+
+.motion-btn:hover {
+  transform: translateY(-1px);
+}
+
+.motion-btn:active {
+  transform: scale(0.97);
+}
+
+.motion-pulse-soft {
+  animation: pulseSoft 2s ease-in-out infinite;
+}
+
+@media (min-width: 768px) {
+  .motion-desktop-right {
+    animation: slideInRightSoft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-overlay,
+  .motion-sidebar-enter,
+  .motion-panel-enter,
+  .motion-player-enter,
+  .motion-desktop-right,
+  .motion-pulse-soft {
+    animation: none !important;
+  }
+
+  .motion-btn {
+    transition: none !important;
+  }
+}
+
+/* Equalizer */
+.equalizer-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 18px;
+}
+
+.equalizer-bars span {
+  width: 3px;
+  background: var(--neon-blue);
+  border-radius: 1px;
+}
+
+@keyframes eqBar1 {
+
+  0%,
+  100% {
+    height: 30%;
+  }
+
+  40% {
+    height: 90%;
+  }
+
+  70% {
+    height: 55%;
+  }
+}
+
+@keyframes eqBar2 {
+
+  0%,
+  100% {
+    height: 60%;
+  }
+
+  30% {
+    height: 20%;
+  }
+
+  60% {
+    height: 100%;
+  }
+}
+
+@keyframes eqBar3 {
+
+  0%,
+  100% {
+    height: 80%;
+  }
+
+  25% {
+    height: 40%;
+  }
+
+  75% {
+    height: 70%;
+  }
+}
+
+@keyframes eqBar4 {
+
+  0%,
+  100% {
+    height: 45%;
+  }
+
+  50% {
+    height: 95%;
+  }
+}
+
+.equalizer-bars span:nth-child(1) {
+  animation: eqBar1 0.9s stepped infinite;
+}
+
+.equalizer-bars span:nth-child(2) {
+  animation: eqBar2 0.7s stepped infinite;
+}
+
+.equalizer-bars span:nth-child(3) {
+  animation: eqBar3 1.1s stepped infinite;
+}
+
+.equalizer-bars span:nth-child(4) {
+  animation: eqBar4 0.8s stepped infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}

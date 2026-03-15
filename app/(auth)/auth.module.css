@@ -1,0 +1,381 @@
+.authRoot {
+    min-height: 100vh;
+    background: #070707;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: var(--font-body);
+}
+
+.shell {
+    width: 100%;
+    max-width: 1080px;
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    overflow: hidden;
+    background: #0f0f0f;
+}
+
+.artPane {
+    display: none;
+    padding: 48px;
+    background: radial-gradient(circle at 20% 20%, rgba(29, 185, 84, 0.12), transparent 45%), #0d0d0d;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.artContent {
+    max-width: 420px;
+}
+
+.artLogo {
+    width: 100%;
+    max-width: 320px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 22px;
+    object-fit: cover;
+}
+
+.artTitle {
+    margin: 0 0 10px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.artText {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.cardPane {
+    padding: 22px;
+}
+
+.card {
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    background: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 30px 24px;
+}
+
+.logoWrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.logoMark {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid rgba(29, 185, 84, 0.45);
+}
+
+.brand {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2rem;
+    color: #fff;
+    letter-spacing: 0.01em;
+}
+
+.header {
+    margin-bottom: 20px;
+}
+
+.title {
+    margin: 0 0 8px;
+    font-size: 1.7rem;
+    color: #fff;
+    letter-spacing: -0.01em;
+}
+
+.subtitle {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.96rem;
+}
+
+.error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.87rem;
+    color: #ff8686;
+    border: 1px solid rgba(255, 134, 134, 0.35);
+    background: rgba(255, 134, 134, 0.08);
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.profileSection {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.profileRow {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.profileRing {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #151515;
+}
+
+.previewImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder {
+    color: var(--text-dim);
+    font-size: 0.72rem;
+}
+
+.uploadMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.uploadLabel {
+    font-size: 0.92rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+.uploadHint {
+    font-size: 0.76rem;
+    color: var(--text-dim);
+}
+
+.fileInput {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.removeBtn {
+    background: transparent;
+    border: none;
+    color: var(--neon-green);
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.8rem;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.inputWrap {
+    position: relative;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    pointer-events: none;
+}
+
+.input {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #0f0f0f;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    padding: 12px 14px 12px 40px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.input:focus {
+    border-color: rgba(29, 185, 84, 0.7);
+}
+
+.eyeBtn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+}
+
+.inputError {
+    border-color: rgba(255, 134, 134, 0.7);
+}
+
+.inputSuccess {
+    border-color: rgba(29, 185, 84, 0.7);
+}
+
+.strengthWrap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.strengthBar {
+    width: 78px;
+    height: 4px;
+    border-radius: 999px;
+}
+
+.weak {
+    background: #ff8686;
+}
+
+.medium {
+    background: #ffd16a;
+}
+
+.strong {
+    background: #1db954;
+}
+
+.strengthLabel {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+.btn {
+    margin-top: 6px;
+    border: none;
+    border-radius: 10px;
+    background: #1db954;
+    color: #04170a;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 13px;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+    filter: brightness(1.06);
+}
+
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btnLoading {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    border-top-color: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.divider {
+    margin: 16px 0 8px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+.switchText {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.link {
+    color: var(--neon-green);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+@media (min-width: 960px) {
+    .shell {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .artPane {
+        display: block;
+    }
+
+    .cardPane {
+        padding: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card {
+        margin: 0;
+    }
+}
+
+.medium {
+    background: #f59e0b;
+}
+
+.strong {
+    background: var(--neon-green);
+}
