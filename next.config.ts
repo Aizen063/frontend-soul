@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const uploadsOrigin = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://backend-soul.vercel.app';
+const uploadsOrigin = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'https://backend-soul.onrender.com';
 
 const nextConfig: NextConfig = {
   /* config options here */
