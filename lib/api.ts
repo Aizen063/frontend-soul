@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = !configuredApiUrl || configuredApiUrl.includes('backend-soul.vercel.app')
+    ? 'https://backend-soul.onrender.com'
+    : configuredApiUrl;
 
 export const api = axios.create({
     baseURL: API_BASE_URL,
