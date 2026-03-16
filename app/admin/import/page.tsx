@@ -164,6 +164,9 @@ export default function AdminImportPage() {
                     <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(29,185,84,0.2)', color: '#1db954' }}>1</span>
                     DOWNLOAD FROM YOUTUBE
                 </h2>
+                <p className="text-xs text-amber-300/90">
+                    This feature does not work on a Vercel-hosted backend because YouTube blocks serverless download requests as bot traffic. Use a local backend or a VPS/worker deployment for imports.
+                </p>
                 <div className="flex gap-3">
                     <input value={playlistUrl} onChange={e => setPlaylistUrl(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && !running && startImport()}
