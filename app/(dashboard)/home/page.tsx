@@ -8,6 +8,15 @@ import { Song } from '@/types';
 import { usePlayerStore } from '@/store/playerStore';
 import { useAuthStore } from '@/store/authStore';
 
+const normalizeSongs = (input: unknown): Song[] => {
+    if (!Array.isArray(input)) return [];
+    return input.filter((song): song is Song => {
+        if (!song || typeof song !== 'object') return false;
+        const candidate = song as Partial<Song>;
+        return typeof candidate._id === 'string' && candidate._id.length > 0;
+    });
+};
+
 export default function HomePage() {
     const [recentSongs, setRecentSongs] = useState<Song[]>([]);
     const [historySongs, setHistorySongs] = useState<Song[]>([]);
@@ -30,8 +39,11 @@ export default function HomePage() {
                 api.get('/api/users/history')
             ]);
 
-            setRecentSongs(songsRes.data.data || []);
-            setHistorySongs(historyRes.data?.data?.map((h: any) => h.song) || []);
+            const recent = normalizeSongs(songsRes.data.data);
+            const history = normalizeSongs((historyRes.data?.data || []).map((h: any) => h?.song));
+
+            setRecentSongs(recent);
+            setHistorySongs(history);
             setStats({
                 songs: songsRes.data.total || songsRes.data.count || 0,
                 artists: artistsRes.data.total || artistsRes.data.count || 0,
