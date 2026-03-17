@@ -5,6 +5,58 @@ const API_BASE_URL = !configuredApiUrl || configuredApiUrl.includes('backend-sou
     ? 'https://backend-soul.onrender.com'
     : configuredApiUrl;
 
+const MEDIA_URL_KEYS = new Set(['coverImage', 'audioUrl', 'photo', 'profilePic']);
+
+const normalizeMediaUrl = (url: string): string => {
+    if (!url) return url;
+
+    const localhostUploadsPrefix = 'http://localhost:5000/uploads/';
+    const vercelUploadsPrefix = 'https://backend-soul.vercel.app/uploads/';
+
+    if (url.startsWith(localhostUploadsPrefix) || url.startsWith(vercelUploadsPrefix)) {
+        const uploadsPathIndex = url.indexOf('/uploads/');
+        if (uploadsPathIndex !== -1) {
+            return `${API_BASE_URL}${url.slice(uploadsPathIndex)}`;
+        }
+    }
+
+    if (url.startsWith('/uploads/')) {
+        return `${API_BASE_URL}${url}`;
+    }
+
+    return url;
+};
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const sanitizePayload = (value: unknown, parentKey?: string): unknown => {
+    if (Array.isArray(value)) {
+        return value
+            .filter((item) => item !== null && item !== undefined)
+            .map((item) => sanitizePayload(item, parentKey));
+    }
+
+    if (isPlainObject(value)) {
+        const result: Record<string, unknown> = {};
+        for (const [key, nestedValue] of Object.entries(value)) {
+            result[key] = sanitizePayload(nestedValue, key);
+        }
+        return result;
+    }
+
+    if (typeof value === 'string') {
+        if (parentKey && MEDIA_URL_KEYS.has(parentKey)) {
+            return normalizeMediaUrl(value);
+        }
+        if (value.includes('localhost:5000/uploads/') || value.includes('backend-soul.vercel.app/uploads/')) {
+            return normalizeMediaUrl(value);
+        }
+    }
+
+    return value;
+};
+
 export const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
@@ -26,7 +78,10 @@ api.interceptors.request.use(
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        response.data = sanitizePayload(response.data);
+        return response;
+    },
     (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem('token');
