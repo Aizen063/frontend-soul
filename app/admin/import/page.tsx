@@ -19,6 +19,15 @@ interface DownloadEntry {
     status?: 'idle' | 'uploading' | 'success' | 'error'; errorMsg?: string;
 }
 
+const normalizeArtists = (input: unknown): Artist[] => {
+    if (!Array.isArray(input)) return [];
+    return input.filter((artist): artist is Artist => {
+        if (!artist || typeof artist !== 'object') return false;
+        const maybeArtist = artist as Partial<Artist>;
+        return typeof maybeArtist._id === 'string' && maybeArtist._id.length > 0 && typeof maybeArtist.name === 'string';
+    });
+};
+
 export default function AdminImportPage() {
     /* ── YouTube import ── */
     const [playlistUrl, setPlaylistUrl] = useState('');
@@ -39,7 +48,7 @@ export default function AdminImportPage() {
     /* ── init ── */
     useEffect(() => {
         api.get('/api/admin/import').then(r => setRecentJobs(r.data.data || [])).catch(() => { });
-        api.get('/api/artists').then(r => setArtists(r.data.data || [])).catch(() => { });
+        api.get('/api/artists').then(r => setArtists(normalizeArtists(r.data.data))).catch(() => { });
         refreshDownloads();
     }, []);
 
@@ -70,12 +79,16 @@ export default function AdminImportPage() {
             const r = await api.get('/api/admin/import/downloads');
             const artistList: Artist[] = artists.length
                 ? artists
-                : await api.get('/api/artists').then(a => { setArtists(a.data.data || []); return a.data.data || []; });
+                : await api.get('/api/artists').then(a => {
+                    const normalized = normalizeArtists(a.data.data);
+                    setArtists(normalized);
+                    return normalized;
+                });
 
             setDownloads((r.data.data || []).map((d: DownloadEntry & { ext?: string }) => {
                 // Auto-match parsed artist name to a DB artist
-                const matched = artistList.find(
-                    (a: Artist) => a.name.toLowerCase() === (d.artist || '').toLowerCase()
+                const matched = artistList.find((a: Artist) =>
+                    a.name.toLowerCase() === (d.artist || '').toLowerCase()
                 );
                 return { ...d, artistId: matched?._id || '', artistName: matched ? '' : (d.artist || ''), status: 'idle' as const };
             }));
