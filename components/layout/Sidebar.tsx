@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Library, Search, Settings, Mic2, Heart, Music } from 'lucide-react';
+import { Home, Library, Search, Settings, Mic2, Heart, Music, Disc3 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
@@ -18,6 +18,7 @@ export default function Sidebar({ isMobileOpen = false, isDesktopOpen = true, on
     const navItems = [
         { icon: Home, label: 'Home', href: '/home' },
         { icon: Music, label: 'Tracks', href: '/tracks' },
+        { icon: Disc3, label: 'Albums', href: '/albums' },
         { icon: Search, label: 'Search', href: '/search' },
         { icon: Mic2, label: 'Artists', href: '/artists' },
         { icon: Heart, label: 'Liked Songs', href: '/liked' },
