@@ -15,15 +15,15 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: 'en',
     icons: [
       {
-        src: '/pwa-icon.svg',
-        sizes: 'any',
-        type: 'image/svg+xml',
+        src: '/Applogo.png',
+        sizes: '2816x1536',
+        type: 'image/png',
         purpose: 'any',
       },
       {
-        src: '/maskable-icon.svg',
-        sizes: 'any',
-        type: 'image/svg+xml',
+        src: '/Applogo.png',
+        sizes: '2816x1536',
+        type: 'image/png',
         purpose: 'maskable',
       },
     ],
