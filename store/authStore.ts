@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import { User } from '@/types';
 import api from '@/lib/api';
 
+const AUTH_LAST_VERIFIED_AT_KEY = 'auth:lastVerifiedAt';
+const AUTH_VERIFY_TTL_MS = 30 * 60 * 1000;
+
 interface AuthState {
     user: User | null;
     token: string | null;
@@ -25,6 +28,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     login: (token: string, user: User) => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem(AUTH_LAST_VERIFIED_AT_KEY, String(Date.now()));
         set({
             user,
             token,
@@ -37,6 +41,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     logout: () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        localStorage.removeItem(AUTH_LAST_VERIFIED_AT_KEY);
         set({
             user: null,
             token: null,
@@ -52,10 +57,26 @@ export const useAuthStore = create<AuthState>((set) => ({
 
         if (token && userStr) {
             try {
-                // Verify token is still valid with the server
+                const parsedUser = JSON.parse(userStr) as User;
+                set({
+                    user: parsedUser,
+                    token,
+                    isAuthenticated: true,
+                    isAdmin: parsedUser.role?.toLowerCase() === 'admin',
+                    isInitialized: true,
+                });
+
+                const lastVerifiedAt = Number(localStorage.getItem(AUTH_LAST_VERIFIED_AT_KEY) || '0');
+                const isVerificationFresh = Date.now() - lastVerifiedAt < AUTH_VERIFY_TTL_MS;
+
+                if (isVerificationFresh) {
+                    return;
+                }
+
                 const res = await api.get('/api/auth/me');
                 const user = res.data.data;
                 localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem(AUTH_LAST_VERIFIED_AT_KEY, String(Date.now()));
                 set({
                     user,
                     token,
@@ -64,9 +85,9 @@ export const useAuthStore = create<AuthState>((set) => ({
                     isInitialized: true,
                 });
             } catch {
-                // Token is invalid/expired — clear everything
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
+                localStorage.removeItem(AUTH_LAST_VERIFIED_AT_KEY);
                 set({ user: null, token: null, isAuthenticated: false, isAdmin: false, isInitialized: true });
             }
         } else {

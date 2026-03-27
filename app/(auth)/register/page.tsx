@@ -71,7 +71,7 @@ export default function RegisterPage() {
             <div className={s.shell}>
                 <aside className={s.artPane}>
                     <div className={s.artContent}>
-                        <img src="/Gemini_Generated_Image_oqnefeoqnefeoqne-removebg-preview.png" alt="Soul Sound logo" className={s.artLogo} />
+                        <img src="/Applogo.png" alt="Soul Sound logo" className={s.artLogo} />
                         <h2 className={s.artTitle}>Start your sound journey.</h2>
                         <p className={s.artText}>Create your profile and step into a cleaner, focused music experience.</p>
                     </div>
@@ -80,7 +80,7 @@ export default function RegisterPage() {
                 <section className={s.cardPane}>
                     <div className={s.card}>
                         <div className={s.logoWrap}>
-                            <img src="/Gemini_Generated_Image_oqnefeoqnefeoqne-removebg-preview.png" alt="Soul Sound logo" className={s.logoMark} />
+                            <img src="/Applogo.png" alt="Soul Sound logo" className={s.logoMark} />
                             <h1 className={s.brand}>Soul Sound</h1>
                         </div>
 
