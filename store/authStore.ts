@@ -3,7 +3,16 @@ import { User } from '@/types';
 import api from '@/lib/api';
 
 const AUTH_LAST_VERIFIED_AT_KEY = 'auth:lastVerifiedAt';
-const AUTH_VERIFY_TTL_MS = 30 * 60 * 1000;
+const AUTH_SESSION_STARTED_AT_KEY = 'auth:sessionStartedAt';
+const AUTH_SESSION_TTL_MS = 60 * 24 * 60 * 60 * 1000;
+const AUTH_VERIFY_TTL_MS = 24 * 60 * 60 * 1000;
+
+const clearStoredAuth = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem(AUTH_LAST_VERIFIED_AT_KEY);
+    localStorage.removeItem(AUTH_SESSION_STARTED_AT_KEY);
+};
 
 interface AuthState {
     user: User | null;
@@ -28,6 +37,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     login: (token: string, user: User) => {
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem(AUTH_SESSION_STARTED_AT_KEY, String(Date.now()));
         localStorage.setItem(AUTH_LAST_VERIFIED_AT_KEY, String(Date.now()));
         set({
             user,
@@ -39,9 +49,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     },
 
     logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem(AUTH_LAST_VERIFIED_AT_KEY);
+        clearStoredAuth();
         set({
             user: null,
             token: null,
@@ -57,6 +65,18 @@ export const useAuthStore = create<AuthState>((set) => ({
 
         if (token && userStr) {
             try {
+                const now = Date.now();
+                const fallbackStartAt = Number(localStorage.getItem(AUTH_LAST_VERIFIED_AT_KEY) || String(now));
+                const sessionStartedAt = Number(localStorage.getItem(AUTH_SESSION_STARTED_AT_KEY) || String(fallbackStartAt));
+
+                localStorage.setItem(AUTH_SESSION_STARTED_AT_KEY, String(sessionStartedAt));
+
+                if (now - sessionStartedAt > AUTH_SESSION_TTL_MS) {
+                    clearStoredAuth();
+                    set({ user: null, token: null, isAuthenticated: false, isAdmin: false, isInitialized: true });
+                    return;
+                }
+
                 const parsedUser = JSON.parse(userStr) as User;
                 set({
                     user: parsedUser,
@@ -85,9 +105,7 @@ export const useAuthStore = create<AuthState>((set) => ({
                     isInitialized: true,
                 });
             } catch {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                localStorage.removeItem(AUTH_LAST_VERIFIED_AT_KEY);
+                clearStoredAuth();
                 set({ user: null, token: null, isAuthenticated: false, isAdmin: false, isInitialized: true });
             }
         } else {

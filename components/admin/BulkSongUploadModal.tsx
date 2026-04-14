@@ -123,12 +123,12 @@ export default function BulkSongUploadModal({ isOpen, onClose, onSuccess }: Prop
     const hasCoverMismatch = entries.some(e => e.coverFile && !e.audioFile);
 
     return (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}>
-            <div className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl overflow-hidden"
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-4" style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}>
+            <div className="w-full max-w-4xl max-h-[92dvh] sm:max-h-[90vh] flex flex-col rounded-2xl overflow-hidden"
                 style={{ background: '#0d0d1f', border: '1px solid rgba(0,245,255,0.15)', boxShadow: '0 0 60px rgba(0,245,255,0.08)' }}>
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'rgba(0,245,255,0.1)' }}>
+                <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b" style={{ borderColor: 'rgba(0,245,255,0.1)' }}>
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg,rgba(0,245,255,0.2),rgba(255,0,200,0.2))', border: '1px solid rgba(0,245,255,0.3)' }}>
                             <Upload size={18} style={{ color: '#00f5ff' }} />
@@ -145,7 +145,7 @@ export default function BulkSongUploadModal({ isOpen, onClose, onSuccess }: Prop
 
                 {/* Results panel */}
                 {results && (
-                    <div className="px-6 py-4 border-b space-y-2" style={{ borderColor: 'rgba(0,245,255,0.1)', background: 'rgba(0,0,0,0.3)' }}>
+                    <div className="px-4 sm:px-6 py-4 border-b space-y-2" style={{ borderColor: 'rgba(0,245,255,0.1)', background: 'rgba(0,0,0,0.3)' }}>
                         <p className="text-xs font-bold tracking-widest" style={{ color: 'rgba(255,255,255,0.4)' }}>UPLOAD RESULTS</p>
                         {results.map(r => (
                             <div key={r.index} className="flex items-center gap-3 text-sm">
@@ -173,7 +173,7 @@ export default function BulkSongUploadModal({ isOpen, onClose, onSuccess }: Prop
 
                 {/* Song rows */}
                 {!results && (
-                    <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+                    <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-3">
                         {entries.map((entry, idx) => (
                             <div key={entry.id} className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
                                 {/* Row header */}
@@ -187,7 +187,7 @@ export default function BulkSongUploadModal({ isOpen, onClose, onSuccess }: Prop
                                 </div>
 
                                 {/* File pickers */}
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     {/* Audio */}
                                     <button
                                         type="button"
@@ -216,12 +216,12 @@ export default function BulkSongUploadModal({ isOpen, onClose, onSuccess }: Prop
                                 </div>
 
                                 {/* Metadata */}
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <input
                                         placeholder="Song title *"
                                         value={entry.title}
                                         onChange={e => updateEntry(entry.id, { title: e.target.value })}
-                                        className="col-span-2 px-3 py-2 rounded-xl text-sm focus:outline-none text-white"
+                                        className="sm:col-span-2 px-3 py-2 rounded-xl text-sm focus:outline-none text-white"
                                         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
                                     />
                                     <select
@@ -244,7 +244,7 @@ export default function BulkSongUploadModal({ isOpen, onClose, onSuccess }: Prop
                                         placeholder="Album"
                                         value={entry.album}
                                         onChange={e => updateEntry(entry.id, { album: e.target.value })}
-                                        className="col-span-2 px-3 py-2 rounded-xl text-sm focus:outline-none text-white"
+                                        className="sm:col-span-2 px-3 py-2 rounded-xl text-sm focus:outline-none text-white"
                                         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
                                     />
                                 </div>
@@ -263,12 +263,26 @@ export default function BulkSongUploadModal({ isOpen, onClose, onSuccess }: Prop
 
                 {/* Footer */}
                 {!results && (
-                    <div className="px-6 py-4 border-t flex items-center justify-between gap-4" style={{ borderColor: 'rgba(0,245,255,0.1)' }}>
+                    <div className="px-4 sm:px-6 py-4 border-t flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" style={{ borderColor: 'rgba(0,245,255,0.1)' }}>
                         <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
                             {entries.filter(e => e.audioFile).length}/{entries.length} audio files selected
                             {hasCoverMismatch && <span className="text-yellow-400 ml-2">⚠ Some covers have no audio</span>}
                         </p>
-                        <div className="flex gap-3">
+                        <div className="flex w-full gap-3 sm:hidden">
+                            <button onClick={onClose} className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-white/10"
+                                style={{ color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)', width: '100%' }}>
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSubmit}
+                                disabled={uploading || !entries.some(e => e.audioFile && e.artistId)}
+                                className="px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                style={{ background: 'linear-gradient(135deg,#00f5ff,#ff00c8)', color: '#000', width: '100%' }}
+                            >
+                                {uploading ? <><Loader2 size={16} className="animate-spin" /> Uploading...</> : <><Upload size={16} /> Upload All</>}
+                            </button>
+                        </div>
+                        <div className="hidden sm:flex gap-3">
                             <button onClick={onClose} className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-white/10"
                                 style={{ color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
                                 Cancel

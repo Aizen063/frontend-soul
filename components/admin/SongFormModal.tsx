@@ -89,21 +89,21 @@ export default function SongFormModal({ isOpen, onClose, onSuccess, songToEdit }
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-                    <h2 className="text-xl font-bold text-white">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4">
+            <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-2xl max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto">
+                <div className="p-4 sm:p-6 border-b border-slate-800 flex justify-between items-center gap-3">
+                    <h2 className="text-lg sm:text-xl font-bold text-white">
                         {songToEdit ? 'Edit Song' : 'Add New Song'}
                     </h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-white"><X size={24} /></button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 sm:space-y-6">
                     {error && (
                         <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-lg">{error}</div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         {/* Title */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-slate-400">Title *</label>
@@ -162,14 +162,14 @@ export default function SongFormModal({ isOpen, onClose, onSuccess, songToEdit }
                             value={formData.lyrics}
                             onChange={(e) => setFormData({ ...formData, lyrics: e.target.value })}
                             placeholder="[00:15.22] Example Lyric Line..."
-                            className="w-full h-32 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white font-mono text-xs focus:outline-none focus:border-purple-500"
+                            className="w-full h-28 sm:h-32 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white font-mono text-xs focus:outline-none focus:border-purple-500"
                         />
                     </div>
 
                     {/* File uploads */}
                     <div className="space-y-4 pt-4 border-t border-slate-800">
                         <h3 className="text-lg font-semibold text-white">Media Files {songToEdit && '(Upload to replace)'}</h3>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="border border-slate-700 border-dashed rounded-lg p-4 text-center hover:bg-slate-800/50 transition-colors">
                                 <label className="cursor-pointer block">
                                     <Music className="w-8 h-8 text-purple-400 mx-auto mb-2" />
@@ -203,18 +203,18 @@ export default function SongFormModal({ isOpen, onClose, onSuccess, songToEdit }
                         </div>
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-6 border-t border-slate-800">
+                    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-6 border-t border-slate-800">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                            className="w-full sm:w-auto px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Saving...' : songToEdit ? 'Update Song' : 'Create Song'}
                         </button>
