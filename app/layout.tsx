@@ -24,9 +24,12 @@ export const metadata: Metadata = {
     telephone: false,
   },
   icons: {
-    icon: "/Applogo.png",
-    apple: "/Applogo.png",
-    shortcut: "/Applogo.png",
+    icon: [
+      { url: "/pwa-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/pwa-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/pwa-192.png",
   },
 };
 

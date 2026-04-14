@@ -1,6 +1,6 @@
-const STATIC_CACHE = 'soul-sound-static-v1';
-const RUNTIME_CACHE = 'soul-sound-runtime-v1';
-const APP_SHELL = ['/', '/login', '/register', '/offline', '/manifest.webmanifest', '/pwa-icon.svg', '/maskable-icon.svg'];
+const STATIC_CACHE = 'soul-sound-static-v2';
+const RUNTIME_CACHE = 'soul-sound-runtime-v2';
+const APP_SHELL = ['/', '/login', '/register', '/offline', '/manifest.webmanifest', '/pwa-192.png', '/pwa-512.png', '/maskable-512.png', '/apple-touch-icon.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
