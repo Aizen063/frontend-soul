@@ -77,7 +77,7 @@ export default function PwaSupport() {
       <div className="pointer-events-auto w-full max-w-md rounded-[24px] border border-white/10 bg-[#0d0d0d]/92 p-4 text-white shadow-[0_18px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/15 bg-[#1db954]/10">
-            <img src="/Applogo.png" alt="Soul Sound app logo" className="h-full w-full object-cover" />
+            <img src="/Soullogo.png" alt="Soul Sound app logo" className="h-full w-full object-cover" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">Install Soul Sound</p>

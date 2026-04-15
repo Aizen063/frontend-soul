@@ -40,7 +40,7 @@ export default function LoginPage() {
             <div className={s.shell}>
                 <aside className={s.artPane}>
                     <div className={s.artContent}>
-                        <img src="/Applogo.png" alt="Soul Sound logo" className={s.artLogo} />
+                        <img src="/Soullogo.png" alt="Soul Sound logo" className={s.artLogo} />
                         <h2 className={s.artTitle}>Music. Mood. Momentum.</h2>
                         <p className={s.artText}>Stream what you love in a clean, distraction-free listening experience.</p>
                     </div>
@@ -49,7 +49,7 @@ export default function LoginPage() {
                 <section className={s.cardPane}>
                     <div className={s.card}>
                         <div className={s.logoWrap}>
-                            <img src="/Applogo.png" alt="Soul Sound logo" className={s.logoMark} />
+                            <img src="/Soullogo.png" alt="Soul Sound logo" className={s.logoMark} />
                             <h1 className={s.brand}>Soul Sound</h1>
                         </div>
 
