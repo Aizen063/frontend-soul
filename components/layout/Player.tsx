@@ -94,6 +94,7 @@ export default function Player() {
     const [audioOutputs, setAudioOutputs] = useState<AudioOutputDevice[]>([]);
     const [activeOutputId, setActiveOutputId] = useState<string>('default');
     const [activeOutputRoute, setActiveOutputRoute] = useState<OutputRoute>('default');
+    const [inferredOutputLabel, setInferredOutputLabel] = useState<string | null>(null);
     const [supportsSinkSelection, setSupportsSinkSelection] = useState(false);
     const [hasOutputLabelAccess, setHasOutputLabelAccess] = useState(false);
     const [isDetectingOutputs, setIsDetectingOutputs] = useState(false);
@@ -104,7 +105,9 @@ export default function Player() {
         }
 
         try {
-            const outputs = (await navigator.mediaDevices.enumerateDevices())
+            const allDevices = await navigator.mediaDevices.enumerateDevices();
+
+            const outputs = allDevices
                 .filter((device) => device.kind === 'audiooutput')
                 .map((device, index) => {
                     const label = device.label || `Audio Output ${index + 1}`;
@@ -115,8 +118,22 @@ export default function Player() {
                     };
                 });
 
+            const inputs = allDevices
+                .filter((device) => device.kind === 'audioinput')
+                .map((device, index) => {
+                    const label = device.label || `Audio Input ${index + 1}`;
+                    return {
+                        deviceId: device.deviceId,
+                        label,
+                        route: resolveOutputRoute(label),
+                    };
+                });
+
             setAudioOutputs(outputs);
-            setHasOutputLabelAccess(outputs.some((device) => !device.label.startsWith('Audio Output ')));
+            setHasOutputLabelAccess(
+                outputs.some((device) => !device.label.startsWith('Audio Output ')) ||
+                inputs.some((device) => !device.label.startsWith('Audio Input '))
+            );
 
             const sinkAudio = audioRef.current as SinkAudioElement | null;
             const sinkId = sinkAudio?.sinkId;
@@ -124,10 +141,28 @@ export default function Player() {
             const currentDevice = outputs.find((device) => device.deviceId === currentId);
             const defaultDevice = outputs.find((device) => device.deviceId === 'default');
             const wirelessCandidate = outputs.find((device) => device.route === 'carplay' || device.route === 'tws' || device.route === 'bluetooth');
+            const defaultInput = inputs.find((device) => device.deviceId === 'default');
+            const wirelessInputCandidate = inputs.find((device) => device.route === 'carplay' || device.route === 'tws' || device.route === 'bluetooth');
             const inferredDevice = currentDevice || (currentId === 'default' ? (defaultDevice || wirelessCandidate || outputs[0]) : undefined);
 
+            let inferredRoute = inferredDevice?.route || 'default';
+            let inferredLabel: string | null = inferredDevice?.label || null;
+
+            if (currentId === 'default' && inferredRoute === 'default') {
+                const defaultWirelessHint =
+                    (defaultInput && defaultInput.route !== 'default' ? defaultInput : undefined) ||
+                    (wirelessInputCandidate && wirelessInputCandidate.route !== 'default' ? wirelessInputCandidate : undefined) ||
+                    (wirelessCandidate && wirelessCandidate.route !== 'default' ? wirelessCandidate : undefined);
+
+                if (defaultWirelessHint) {
+                    inferredRoute = defaultWirelessHint.route;
+                    inferredLabel = `System default (${defaultWirelessHint.label})`;
+                }
+            }
+
             setActiveOutputId(currentId);
-            setActiveOutputRoute(inferredDevice?.route || 'default');
+            setActiveOutputRoute(inferredRoute);
+            setInferredOutputLabel(inferredLabel);
         } catch (error) {
             console.error('Failed to enumerate audio outputs', error);
         }
@@ -159,6 +194,7 @@ export default function Player() {
             setActiveOutputId(deviceId);
             const selected = audioOutputs.find((device) => device.deviceId === deviceId);
             setActiveOutputRoute(selected?.route || 'default');
+            setInferredOutputLabel(selected?.label || null);
         } catch (error) {
             console.error('Failed to switch audio output', error);
         }
@@ -278,7 +314,7 @@ export default function Player() {
     if (!currentSong) return null;
 
     const activeOutputDevice = audioOutputs.find((device) => device.deviceId === activeOutputId);
-    const outputLabel = activeOutputDevice?.label || getRouteLabel(activeOutputRoute);
+    const outputLabel = activeOutputDevice?.label || inferredOutputLabel || getRouteLabel(activeOutputRoute);
     const isTwsOrCarPlayRoute = activeOutputRoute === 'tws' || activeOutputRoute === 'carplay';
     const routeBadgeText = activeOutputRoute === 'carplay'
         ? 'CarPlay Routed'
