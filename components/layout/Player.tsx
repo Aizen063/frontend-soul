@@ -95,6 +95,8 @@ export default function Player() {
     const [activeOutputId, setActiveOutputId] = useState<string>('default');
     const [activeOutputRoute, setActiveOutputRoute] = useState<OutputRoute>('default');
     const [supportsSinkSelection, setSupportsSinkSelection] = useState(false);
+    const [hasOutputLabelAccess, setHasOutputLabelAccess] = useState(false);
+    const [isDetectingOutputs, setIsDetectingOutputs] = useState(false);
 
     const refreshAudioOutputs = async () => {
         if (typeof window === 'undefined' || !navigator.mediaDevices?.enumerateDevices) {
@@ -114,16 +116,37 @@ export default function Player() {
                 });
 
             setAudioOutputs(outputs);
+            setHasOutputLabelAccess(outputs.some((device) => !device.label.startsWith('Audio Output ')));
 
             const sinkAudio = audioRef.current as SinkAudioElement | null;
             const sinkId = sinkAudio?.sinkId;
             const currentId = sinkId && sinkId.length > 0 ? sinkId : 'default';
             const currentDevice = outputs.find((device) => device.deviceId === currentId);
+            const defaultDevice = outputs.find((device) => device.deviceId === 'default');
+            const wirelessCandidate = outputs.find((device) => device.route === 'carplay' || device.route === 'tws' || device.route === 'bluetooth');
+            const inferredDevice = currentDevice || (currentId === 'default' ? (defaultDevice || wirelessCandidate || outputs[0]) : undefined);
 
             setActiveOutputId(currentId);
-            setActiveOutputRoute(currentDevice?.route || 'default');
+            setActiveOutputRoute(inferredDevice?.route || 'default');
         } catch (error) {
             console.error('Failed to enumerate audio outputs', error);
+        }
+    };
+
+    const enableOutputDetection = async () => {
+        if (!navigator.mediaDevices?.getUserMedia) {
+            return;
+        }
+
+        setIsDetectingOutputs(true);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach((track) => track.stop());
+            await refreshAudioOutputs();
+        } catch (error) {
+            console.error('Audio permission denied for output detection', error);
+        } finally {
+            setIsDetectingOutputs(false);
         }
     };
 
@@ -496,6 +519,20 @@ export default function Player() {
                         <span className="text-[11px] whitespace-nowrap" style={{ color: 'var(--text-dim)' }}>
                             Output: {getRouteLabel(activeOutputRoute)}
                         </span>
+                        {!hasOutputLabelAccess && (
+                            <button
+                                onClick={enableOutputDetection}
+                                disabled={isDetectingOutputs}
+                                className="text-[11px] px-2 py-1 rounded-md"
+                                style={{
+                                    background: 'rgba(29,185,84,0.14)',
+                                    color: '#d9ffd9',
+                                    border: '1px solid rgba(29,185,84,0.35)'
+                                }}
+                            >
+                                {isDetectingOutputs ? 'Detecting...' : 'Detect devices'}
+                            </button>
+                        )}
                         {supportsSinkSelection && audioOutputs.length > 0 && (
                             <select
                                 value={activeOutputId}
@@ -689,6 +726,20 @@ export default function Player() {
                     <p className="text-xs" style={{ color: '#9a9a9a' }}>
                         Audio output: <span style={{ color: '#fff' }}>{outputLabel}</span>
                     </p>
+                    {!hasOutputLabelAccess && (
+                        <button
+                            onClick={enableOutputDetection}
+                            disabled={isDetectingOutputs}
+                            className="mt-2 w-full h-10 rounded-xl px-3 text-sm"
+                            style={{
+                                background: 'rgba(29,185,84,0.14)',
+                                color: '#d6ffd6',
+                                border: '1px solid rgba(29,185,84,0.35)'
+                            }}
+                        >
+                            {isDetectingOutputs ? 'Detecting outputs...' : 'Detect Bluetooth/TWS devices'}
+                        </button>
+                    )}
                     {supportsSinkSelection && audioOutputs.length > 0 && (
                         <select
                             value={activeOutputId}
