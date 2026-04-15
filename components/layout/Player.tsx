@@ -9,6 +9,61 @@ import QueuePanel from '../player/QueuePanel';
 import EqualizerPanel from '../player/EqualizerPanel';
 import api from '@/lib/api';
 
+type OutputRoute = 'carplay' | 'tws' | 'bluetooth' | 'wired' | 'speaker' | 'default';
+
+type AudioOutputDevice = {
+    deviceId: string;
+    label: string;
+    route: OutputRoute;
+};
+
+type SinkAudioElement = HTMLAudioElement & {
+    setSinkId?: (deviceId: string) => Promise<void>;
+    sinkId?: string;
+};
+
+const resolveOutputRoute = (label: string): OutputRoute => {
+    const normalized = label.toLowerCase();
+
+    if (normalized.includes('carplay')) return 'carplay';
+    if (
+        normalized.includes('tws') ||
+        normalized.includes('earbud') ||
+        normalized.includes('earbuds') ||
+        normalized.includes('airpods') ||
+        normalized.includes('buds')
+    ) {
+        return 'tws';
+    }
+    if (
+        normalized.includes('bluetooth') ||
+        normalized.includes('hands-free') ||
+        normalized.includes('a2dp')
+    ) {
+        return 'bluetooth';
+    }
+    if (
+        normalized.includes('wired') ||
+        normalized.includes('headphone') ||
+        normalized.includes('headset') ||
+        normalized.includes('aux') ||
+        normalized.includes('usb')
+    ) {
+        return 'wired';
+    }
+    if (normalized.includes('speaker') || normalized.includes('loudspeaker')) return 'speaker';
+    return 'default';
+};
+
+const getRouteLabel = (route: OutputRoute): string => {
+    if (route === 'carplay') return 'CarPlay';
+    if (route === 'tws') return 'TWS / Earbuds';
+    if (route === 'bluetooth') return 'Bluetooth Audio';
+    if (route === 'wired') return 'Wired Output';
+    if (route === 'speaker') return 'Device Speaker';
+    return 'System Default';
+};
+
 export default function Player() {
     const {
         currentSong,
@@ -36,6 +91,55 @@ export default function Player() {
     const [isEqOpen, setIsEqOpen] = useState(false);
     const [isMobileNowPlayingOpen, setIsMobileNowPlayingOpen] = useState(false);
     const [isRepeatOne, setIsRepeatOne] = useState(false);
+    const [audioOutputs, setAudioOutputs] = useState<AudioOutputDevice[]>([]);
+    const [activeOutputId, setActiveOutputId] = useState<string>('default');
+    const [activeOutputRoute, setActiveOutputRoute] = useState<OutputRoute>('default');
+    const [supportsSinkSelection, setSupportsSinkSelection] = useState(false);
+
+    const refreshAudioOutputs = async () => {
+        if (typeof window === 'undefined' || !navigator.mediaDevices?.enumerateDevices) {
+            return;
+        }
+
+        try {
+            const outputs = (await navigator.mediaDevices.enumerateDevices())
+                .filter((device) => device.kind === 'audiooutput')
+                .map((device, index) => {
+                    const label = device.label || `Audio Output ${index + 1}`;
+                    return {
+                        deviceId: device.deviceId,
+                        label,
+                        route: resolveOutputRoute(label),
+                    };
+                });
+
+            setAudioOutputs(outputs);
+
+            const sinkAudio = audioRef.current as SinkAudioElement | null;
+            const sinkId = sinkAudio?.sinkId;
+            const currentId = sinkId && sinkId.length > 0 ? sinkId : 'default';
+            const currentDevice = outputs.find((device) => device.deviceId === currentId);
+
+            setActiveOutputId(currentId);
+            setActiveOutputRoute(currentDevice?.route || 'default');
+        } catch (error) {
+            console.error('Failed to enumerate audio outputs', error);
+        }
+    };
+
+    const handleOutputChange = async (deviceId: string) => {
+        const sinkAudio = audioRef.current as SinkAudioElement | null;
+        if (!sinkAudio?.setSinkId) return;
+
+        try {
+            await sinkAudio.setSinkId(deviceId === 'default' ? '' : deviceId);
+            setActiveOutputId(deviceId);
+            const selected = audioOutputs.find((device) => device.deviceId === deviceId);
+            setActiveOutputRoute(selected?.route || 'default');
+        } catch (error) {
+            console.error('Failed to switch audio output', error);
+        }
+    };
 
     useEffect(() => {
         if (currentSong && audioRef.current) {
@@ -64,6 +168,23 @@ export default function Player() {
             else audioRef.current.pause();
         }
     }, [isPlaying]);
+
+    useEffect(() => {
+        const sinkAudio = audioRef.current as SinkAudioElement | null;
+        const canSelect = Boolean(sinkAudio?.setSinkId) && Boolean(navigator.mediaDevices?.enumerateDevices);
+        setSupportsSinkSelection(canSelect);
+
+        refreshAudioOutputs();
+
+        const handleDeviceChange = () => {
+            refreshAudioOutputs();
+        };
+
+        navigator.mediaDevices?.addEventListener?.('devicechange', handleDeviceChange);
+        return () => {
+            navigator.mediaDevices?.removeEventListener?.('devicechange', handleDeviceChange);
+        };
+    }, []);
 
     useEffect(() => {
         if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume / 100;
@@ -132,6 +253,15 @@ export default function Player() {
     };
 
     if (!currentSong) return null;
+
+    const activeOutputDevice = audioOutputs.find((device) => device.deviceId === activeOutputId);
+    const outputLabel = activeOutputDevice?.label || getRouteLabel(activeOutputRoute);
+    const isTwsOrCarPlayRoute = activeOutputRoute === 'tws' || activeOutputRoute === 'carplay';
+    const routeBadgeText = activeOutputRoute === 'carplay'
+        ? 'CarPlay Routed'
+        : activeOutputRoute === 'tws'
+            ? 'TWS Routed'
+            : getRouteLabel(activeOutputRoute);
 
     const iconBtnStyle = (active?: boolean) => ({
         borderRadius: '10px',
@@ -203,6 +333,16 @@ export default function Player() {
                         <p className="text-[11px] sm:text-xs truncate" style={{ color: 'var(--text-dim)', fontFamily: "var(--font-body)" }}>
                             {typeof currentSong.artist === 'object' ? currentSong.artist?.name : currentSong.artist || 'Unknown Artist'}
                         </p>
+                        <span
+                            className="hidden sm:inline-flex mt-1 px-2 py-0.5 text-[10px] rounded-full"
+                            style={{
+                                color: isTwsOrCarPlayRoute ? '#0a0a0a' : '#d2d2d2',
+                                background: isTwsOrCarPlayRoute ? 'var(--neon-green)' : 'rgba(255,255,255,0.1)',
+                                border: isTwsOrCarPlayRoute ? '1px solid rgba(29,185,84,0.7)' : '1px solid rgba(255,255,255,0.15)'
+                            }}
+                        >
+                            {routeBadgeText}
+                        </span>
                     </div>
 
                     <Maximize2 size={14} className="sm:hidden text-[#888]" />
@@ -351,6 +491,31 @@ export default function Player() {
                             }}
                         />
                     </div>
+
+                    <div className="hidden lg:flex items-center gap-2 pl-1">
+                        <span className="text-[11px] whitespace-nowrap" style={{ color: 'var(--text-dim)' }}>
+                            Output: {getRouteLabel(activeOutputRoute)}
+                        </span>
+                        {supportsSinkSelection && audioOutputs.length > 0 && (
+                            <select
+                                value={activeOutputId}
+                                onChange={(e) => handleOutputChange(e.target.value)}
+                                className="text-[11px] px-2 py-1 rounded-md"
+                                style={{
+                                    background: 'rgba(255,255,255,0.06)',
+                                    color: 'var(--text-primary)',
+                                    border: '1px solid rgba(255,255,255,0.12)'
+                                }}
+                            >
+                                <option value="default">System Default</option>
+                                {audioOutputs.map((device) => (
+                                    <option key={device.deviceId} value={device.deviceId}>
+                                        {device.label}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
                 </div>
 
                 {/* Mobile Progress Bar */}
@@ -417,6 +582,16 @@ export default function Player() {
                             <p className="text-base text-[#909090] truncate mt-1">
                                 {typeof currentSong.artist === 'object' ? currentSong.artist?.name : currentSong.artist || 'Unknown Artist'}
                             </p>
+                            <span
+                                className="inline-flex mt-2 px-2.5 py-1 text-[11px] rounded-full"
+                                style={{
+                                    color: isTwsOrCarPlayRoute ? '#0a0a0a' : '#d2d2d2',
+                                    background: isTwsOrCarPlayRoute ? 'var(--neon-green)' : 'rgba(255,255,255,0.1)',
+                                    border: isTwsOrCarPlayRoute ? '1px solid rgba(29,185,84,0.7)' : '1px solid rgba(255,255,255,0.15)'
+                                }}
+                            >
+                                {routeBadgeText}
+                            </span>
                         </div>
                         <button
                             onClick={handleLikeToggle}
@@ -508,6 +683,31 @@ export default function Player() {
                     >
                         {isMuted || volume === 0 ? 'Unmute' : 'Mute'}
                     </button>
+                </div>
+
+                <div className="px-5 pt-4">
+                    <p className="text-xs" style={{ color: '#9a9a9a' }}>
+                        Audio output: <span style={{ color: '#fff' }}>{outputLabel}</span>
+                    </p>
+                    {supportsSinkSelection && audioOutputs.length > 0 && (
+                        <select
+                            value={activeOutputId}
+                            onChange={(e) => handleOutputChange(e.target.value)}
+                            className="mt-2 w-full h-10 rounded-xl px-3 text-sm"
+                            style={{
+                                background: '#1a1a1a',
+                                color: '#d6d6d6',
+                                border: '1px solid #2a2a2a'
+                            }}
+                        >
+                            <option value="default">System Default</option>
+                            {audioOutputs.map((device) => (
+                                <option key={device.deviceId} value={device.deviceId}>
+                                    {device.label}
+                                </option>
+                            ))}
+                        </select>
+                    )}
                 </div>
             </div>
         
