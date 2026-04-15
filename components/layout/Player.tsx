@@ -610,7 +610,7 @@ export default function Player() {
         </div>
 
         <div
-            className={`fixed inset-0 z-[90] md:hidden flex flex-col transition-all duration-300 ease-out ${isMobileNowPlayingOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-8 pointer-events-none'}`}
+            className={`fixed inset-0 z-[90] md:hidden flex flex-col overflow-y-auto transition-all duration-300 ease-out ${isMobileNowPlayingOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-8 pointer-events-none'}`}
             style={{ background: 'linear-gradient(180deg, #111 0%, #0b0b0b 100%)' }}
         >
                 <div className="px-5 pt-[max(env(safe-area-inset-top),16px)] pb-3 flex items-center justify-between">
