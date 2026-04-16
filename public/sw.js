@@ -1,5 +1,5 @@
-const STATIC_CACHE = 'soul-sound-static-v3';
-const RUNTIME_CACHE = 'soul-sound-runtime-v3';
+const STATIC_CACHE = 'soul-sound-static-v4';
+const RUNTIME_CACHE = 'soul-sound-runtime-v4';
 const APP_SHELL = ['/', '/login', '/register', '/offline', '/manifest.webmanifest', '/pwa-192.png', '/pwa-512.png', '/maskable-512.png', '/apple-touch-icon.png'];
 
 self.addEventListener('install', (event) => {

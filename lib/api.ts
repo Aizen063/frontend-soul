@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '@/store/authStore';
 
 const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL;
 const API_BASE_URL = !configuredApiUrl || configuredApiUrl.includes('backend-soul.vercel.app')
@@ -84,9 +85,18 @@ api.interceptors.response.use(
     },
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login';
+            // Don't intercept the /me verification call — authStore handles
+            // that itself and decides whether to log out.
+            const requestUrl: string = error.config?.url || '';
+            if (requestUrl.includes('/api/auth/me')) {
+                return Promise.reject(error);
+            }
+
+            // For every other 401 (e.g. expired token mid-session),
+            // delegate to authStore so cleanup is consistent.
+            useAuthStore.getState().logout();
+            // Use replace so the back button doesn't return to the protected page.
+            window.location.replace('/login');
         }
         return Promise.reject(error);
     }
