@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
+import { getAuthCookie } from '@/lib/cookies';
 
 const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL;
 const API_BASE_URL = !configuredApiUrl || configuredApiUrl.includes('backend-soul.vercel.app')
@@ -68,7 +69,8 @@ export const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
+        // Read from localStorage first (fast), fall back to cookie if cleared.
+        const token = localStorage.getItem('token') ?? getAuthCookie()?.token;
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }

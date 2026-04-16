@@ -1,7 +1,26 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Music, Users, Sparkles } from 'lucide-react';
+import { getAuthCookie } from '@/lib/cookies';
 
 export default function LandingPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // If the user already has a valid auth cookie, skip the landing page
+    // and send them straight to their dashboard.
+    const auth = getAuthCookie();
+    if (!auth) return;
+
+    if (auth.role.toLowerCase() === 'admin') {
+      router.replace('/admin/dashboard');
+    } else {
+      router.replace('/home');
+    }
+  }, [router]);
   return (
     <div className="min-h-screen bg-cyber-black selection:bg-neon-pink selection:text-white">
       {/* Hero Section */}
