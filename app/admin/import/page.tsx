@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import {
-    Download, Play, RefreshCw, Youtube, CheckCircle, AlertCircle,
+    Download, RefreshCw, CheckCircle, AlertCircle,
     Loader2, Clock, Upload, Music, Trash2, ChevronDown, ChevronUp
 } from 'lucide-react';
 import api from '@/lib/api';
@@ -29,7 +29,7 @@ const normalizeArtists = (input: unknown): Artist[] => {
 };
 
 export default function AdminImportPage() {
-    /* ── YouTube import ── */
+    /* ── Source import (YouTube + Spotify track) ── */
     const [playlistUrl, setPlaylistUrl] = useState('');
     const [jobId, setJobId] = useState<string | null>(null);
     const [job, setJob] = useState<Job | null>(null);
@@ -105,7 +105,7 @@ export default function AdminImportPage() {
     };
 
     const startImport = async () => {
-        if (!playlistUrl.trim()) return setImportError('Please enter a YouTube playlist URL.');
+        if (!playlistUrl.trim()) return setImportError('Please enter a YouTube URL or Spotify link.');
         setImportError(''); setJob(null);
         try {
             const r = await api.post('/api/admin/import', { playlistUrl: playlistUrl.trim() });
@@ -165,9 +165,9 @@ export default function AdminImportPage() {
         <div className="space-y-8 pb-12 animate-fade-in">
             {/* ── Header ── */}
             <div>
-                <h1 className="text-3xl font-bold text-white">YouTube Playlist Importer</h1>
+                <h1 className="text-3xl font-bold text-white">Music Link Importer</h1>
                 <p className="text-[#aaa] mt-1 text-sm">
-                    Download a playlist, review songs, then upload to the database in bulk.
+                    Paste a YouTube playlist/video link or Spotify track/playlist link, then review and upload songs in bulk.
                 </p>
             </div>
 
@@ -175,15 +175,15 @@ export default function AdminImportPage() {
             <section className="rounded-2xl p-6 space-y-4" style={{ background: '#111', border: '1px solid #222' }}>
                 <h2 className="text-sm font-bold tracking-widest text-[#aaa] flex items-center gap-2">
                     <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(29,185,84,0.2)', color: '#1db954' }}>1</span>
-                    DOWNLOAD FROM YOUTUBE
+                    IMPORT FROM LINK
                 </h2>
                 <p className="text-xs text-amber-300/90">
-                    This feature does not work on a Vercel-hosted backend because YouTube blocks serverless download requests as bot traffic. Use a local backend or a VPS/worker deployment for imports.
+                    This feature does not work on a Vercel-hosted backend because downloader access is blocked in serverless runtime. Use a local backend or a VPS/worker deployment for imports.
                 </p>
                 <div className="flex gap-3">
                     <input value={playlistUrl} onChange={e => setPlaylistUrl(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && !running && startImport()}
-                        placeholder="https://youtube.com/playlist?list=..."
+                        placeholder="YouTube playlist/video or Spotify track/playlist URL"
                         disabled={running}
                         className="flex-1 rounded-xl px-4 py-3 text-white text-sm focus:outline-none disabled:opacity-50 transition-colors"
                         style={{ background: '#0f0f0f', border: '1px solid #252525' }} />
